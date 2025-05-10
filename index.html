@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberpunk Quiz Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background: #eaeaea url('https://images.unsplash.com/photo-1533134486753-c833f0ed4866?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') center center;
+            background-size: cover;
+            color: #333;
+        }
+
+        /* Skeuomorphic elements */
+        .skeu-container {
+            background: linear-gradient(to bottom, #f7f7f7, #e1e1e1);
+            border-radius: 8px;
+            box-shadow: 
+                0 1px 2px rgba(0, 0, 0, 0.1),
+                0 -1px 0 rgba(255, 255, 255, 0.8) inset,
+                0 3px 5px rgba(0, 0, 0, 0.2);
+            border: 1px solid #ccc;
+            padding: 20px;
+        }
+
+        .skeu-button {
+            background: linear-gradient(to bottom, #f0f0f0, #d8d8d8);
+            border: 1px solid #aaa;
+            box-shadow: 
+                0 1px 2px rgba(0, 0, 0, 0.1),
+                0 -1px 0 rgba(255, 255, 255, 0.8) inset,
+                0 1px 0 rgba(255, 255, 255, 0.8) inset;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+            color: #333;
+            transition: all 0.1s ease;
+        }
+
+        .skeu-button:active {
+            background: linear-gradient(to top, #f0f0f0, #d8d8d8);
+            box-shadow: 
+                0 1px 0 rgba(255, 255, 255, 0.8) inset,
+                0 -1px 0 rgba(255, 255, 255, 0.4) inset,
+                0 1px 3px rgba(0, 0, 0, 0.2) inset;
+            transform: translateY(1px);
+            transition: all 0.1s ease;
+        }
+
+        .skeu-input {
+            border: 1px solid #aaa;
+            box-shadow: 
+                0 1px 0 rgba(255, 255, 255, 0.8),
+                0 1px 3px rgba(0, 0, 0, 0.1) inset;
+            border-radius: 4px;
+            background: #fff;
+            padding: 8px 12px;
+            transition: all 0.2s ease;
+        }
+
+        .skeu-input:focus {
+            box-shadow: 
+                0 0 5px rgba(65, 131, 215, 0.5),
+                0 1px 3px rgba(0, 0, 0, 0.1) inset;
+            border-color: #4183D7;
+            outline: none;
+        }
+
+        .step-container {
+            display: none;
+        }
+        .active {
+            display: block;
+        }
+
+        #timer {
+            font-size: 1.5rem;
+            color: #e74c3c;
+        }
+
+        .skeu-heading {
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+
+        #camera-feed {
+            border: 3px solid #ccc;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .selected-option {
+            background: linear-gradient(to bottom, #3498db, #2980b9) !important;
+            color: white !important;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3) !important;
+            border-color: #2980b9 !important;
+            box-shadow: 
+                0 1px 0 rgba(255, 255, 255, 0.3) inset,
+                0 -1px 0 rgba(0, 0, 0, 0.1) inset !important;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            border-radius: 5px;
+            background-color: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        /* OTP modal styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="container mx-auto px-4 py-8 min-h-screen">
+        <!-- Step 1: Registration -->
+        <div id="step1" class="step-container active">
+            <h1 class="text-4xl mb-8 skeu-heading text-center font-bold">CYBERPUNK QUIZ PORTAL</h1>
+            <div class="max-w-md mx-auto skeu-container">
+                <h2 class="text-2xl mb-4 skeu-heading">User Registration</h2>
+                <form id="registrationForm" class="space-y-4">
+                    <div>
+                        <label class="block mb-2 font-semibold">Mobile Number</label>
+                        <input type="tel" id="mobile" required pattern="[0-9]{10}" class="w-full skeu-input" placeholder="Enter 10-digit mobile number">
+                    </div>
+                    <div>
+                        <label class="block mb-2 font-semibold">Full Name</label>
+                        <input type="text" id="fullName" required class="w-full skeu-input" placeholder="Enter your full name">
+                    </div>
+                    <button type="submit" class="w-full skeu-button py-2 px-4 rounded font-bold">VERIFY</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- OTP Verification Modal -->
+        <div id="otpModal" class="modal" style="display: none;">
+            <div class="max-w-md mx-auto skeu-container">
+                <h2 class="text-xl mb-4 skeu-heading">OTP Verification</h2>
+                <p class="mb-4">A verification code has been sent to your mobile number</p>
+                <div>
+                    <label class="block mb-2 font-semibold">Enter OTP</label>
+                    <input type="text" id="otpInput" required pattern="[0-9]{4}" maxlength="4" class="w-full skeu-input" placeholder="4-digit OTP">
+                </div>
+                <div class="flex justify-between mt-4">
+                    <button id="resendOtp" class="skeu-button py-1 px-3 rounded">Resend OTP</button>
+                    <button id="verifyOtp" class="skeu-button py-1 px-3 rounded font-bold">Verify OTP</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Photo Verification -->
+        <div id="step2" class="step-container">
+            <h2 class="text-2xl mb-4 skeu-heading text-center">Trust Verification</h2>
+            <div class="max-w-md mx-auto skeu-container">
+                <video id="camera-feed" class="w-full mb-4 rounded" autoplay playsinline></video>
+                <p class="mb-4 text-sm">Your image will be stored securely for verification purposes only and will not be shared with third parties.</p>
+                <button id="captureBtn" class="w-full skeu-button py-2 px-4 rounded font-bold">CAPTURE</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Quiz Instructions -->
+        <div id="step3" class="step-container">
+            <div class="max-w-2xl mx-auto skeu-container">
+                <h2 class="text-2xl mb-4 skeu-heading">Quiz Instructions</h2>
+                <ul class="list-disc list-inside space-y-2 ml-4">
+                    <li>Quiz Type: Multiple Choice Questions</li>
+                    <li>Total Time: 30 Minutes</li>
+                    <li>Total Questions: 50 (Randomly Selected from 100)</li>
+                    <li>One attempt per user only</li>
+                    <li>Cannot return to previous questions</li>
+                    <li>Quiz is tied to your device and browser</li>
+                    <li>All responses are recorded with timestamp</li>
+                </ul>
+                <button id="startQuizBtn" class="mt-6 w-full skeu-button py-2 px-4 rounded font-bold">START QUIZ</button>
+            </div>
+        </div>
+
+        <!-- Step 4: Quiz -->
+        <div id="step4" class="step-container">
+            <div class="max-w-2xl mx-auto skeu-container">
+                <div id="timer" class="text-right mb-4 font-bold">30:00</div>
+                <div class="mb-3">
+                    <span id="questionProgress" class="font-semibold">Question 1/50</span>
+                </div>
+                <div id="questionContainer" class="mb-6">
+                    <h3 id="questionText" class="text-xl mb-4 skeu-heading"></h3>
+                    <div id="options" class="space-y-2"></div>
+                </div>
+                <button id="nextBtn" class="w-full skeu-button py-2 px-4 rounded font-bold">NEXT</button>
+            </div>
+        </div>
+        
+        <!-- Step 5: Completion -->
+        <div id="step5" class="step-container">
+            <div class="max-w-2xl mx-auto skeu-container">
+                <h2 class="text-2xl mb-4 skeu-heading text-center">Quiz Completed</h2>
+                <p class="text-center mb-6">Your responses have been recorded. Thank you for participating!</p>
+                
+                <div class="text-center">
+                    <a href="https://zerotize.in/pay/mKP0mr9h" id="paymentLink" class="inline-block skeu-button py-2 px-6 rounded font-bold">Proceed to Payment</a>
+                </div>
+                
+                <div class="mt-8 text-sm text-center text-gray-600">
+                    <p>Your quiz session is now complete. You cannot retake this quiz from this device.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Notification -->
+        <div id="notification" class="notification"></div>
+    </div>
+
+    <script>
+        // Simulated questions database
+        const questions = Array.from({length: 100}, (_, i) => ({
+            id: i + 1,
+            question: `Cyberpunk Question ${i + 1}: What would be the likely outcome of neural implant technology becoming widely available in society?`,
+            options: [
+                'Enhanced human capabilities and medical breakthroughs',
+                'New forms of cybercrime and digital warfare',
+                'Social divisions between augmented and non-augmented humans',
+                'All of the above'
+            ],
+            correct: 3
+        }));
+
+        let currentStep = 1;
+        let selectedQuestions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let sessionId = null;
+        let timerInterval = null;
+        let capturedImage = null;
+
+        // Session management
+        function generateSessionId() {
+            return Math.random().toString(36).substring(2) + Date.now().toString(36);
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.opacity = '1';
+            notification.className = `notification ${type}`;
+            
+            if (type === 'success') {
+                notification.style.backgroundColor = '#d4edda';
+                notification.style.color = '#155724';
+                notification.style.borderColor = '#c3e6cb';
+            } else if (type === 'error') {
+                notification.style.backgroundColor = '#f8d7da';
+                notification.style.color = '#721c24';
+                notification.style.borderColor = '#f5c6cb';
+            }
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+            }, 3000);
+        }
+
+        // Step navigation
+        function showStep(step) {
+            document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
+            document.getElementById(`step${step}`).classList.add('active');
+        }
+
+        // Registration form handling
+        document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const mobileNumber = document.getElementById('mobile').value;
+            const fullName = document.getElementById('fullName').value;
+            
+            if (mobileNumber.length !== 10 || !/^\d+$/.test(mobileNumber)) {
+                showNotification('Please enter a valid 10-digit mobile number', 'error');
+                return;
+            }
+            
+            if (fullName.trim().length < 3) {
+                showNotification('Please enter your full name', 'error');
+                return;
+            }
+            
+            // Generate OTP and show modal
+            const otp = String(Math.floor(1000 + Math.random() * 9000));
+            console.log('Generated OTP:', otp); // In real app, this would be sent via SMS
+            
+            // Show OTP modal
+            document.getElementById('otpModal').style.display = 'flex';
+            
+            // Store user data temporarily
+            sessionStorage.setItem('userMobile', mobileNumber);
+            sessionStorage.setItem('userName', fullName);
+            sessionStorage.setItem('generatedOTP', otp);
+            
+            showNotification('OTP sent to your mobile number', 'success');
+        });
+        
+        // OTP verification
+        document.getElementById('verifyOtp').addEventListener('click', () => {
+            const inputOtp = document.getElementById('otpInput').value;
+            const generatedOtp = sessionStorage.getItem('generatedOTP');
+            
+            if (inputOtp === generatedOtp) {
+                document.getElementById('otpModal').style.display = 'none';
+                sessionId = generateSessionId();
+                localStorage.setItem('quizSessionId', sessionId);
+                
+                // Store additional user information
+                localStorage.setItem('userMobile', sessionStorage.getItem('userMobile'));
+                localStorage.setItem('userName', sessionStorage.getItem('userName'));
+                localStorage.setItem('registrationTime', new Date().toISOString());
+                
+                // Move to camera verification
+                currentStep = 2;
+                showStep(2);
+                initCamera();
+                showNotification('OTP verified successfully', 'success');
+            } else {
+                showNotification('Invalid OTP. Please try again.', 'error');
+            }
+        });
+        
+        document.getElementById('resendOtp').addEventListener('click', () => {
+            const otp = String(Math.floor(1000 + Math.random() * 9000));
+            console.log('New OTP:', otp); // In real app, this would be sent via SMS
+            sessionStorage.setItem('generatedOTP', otp);
+            showNotification('New OTP sent to your mobile', 'success');
+        });
+
+        // Camera handling
+        async function initCamera() {
+            try {
+                const constraints = { 
+                    video: { 
+                        facingMode: "user",
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    } 
+                };
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                const videoElement = document.getElementById('camera-feed');
+                videoElement.srcObject = stream;
+                showNotification('Camera initialized successfully', 'success');
+            } catch (err) {
+                console.error('Camera access error:', err);
+                showNotification('Camera access required for verification', 'error');
+            }
+        }
+
+        document.getElementById('captureBtn').addEventListener('click', () => {
+            const video = document.getElementById('camera-feed');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Convert the captured image to data URL
+            capturedImage = canvas.toDataURL('image/jpeg');
+            
+            // Store the image in localStorage (in production, this should be sent to server)
+            try {
+                localStorage.setItem('userPhoto', capturedImage);
+                localStorage.setItem('photoTimestamp', new Date().toISOString());
+                
+                // Stop the camera stream
+                const stream = video.srcObject;
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+                
+                currentStep = 3;
+                showStep(3);
+                showNotification('Photo captured successfully', 'success');
+            } catch (err) {
+                console.error('Error saving photo:', err);
+                showNotification('Failed to save photo. Storage limit may be exceeded.', 'error');
+            }
+        });
+
+        // Quiz initialization
+        document.getElementById('startQuizBtn').addEventListener('click', () => {
+            // Randomly select 50 questions from 100
+            selectedQuestions = [...questions]
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 50);
+                
+            currentStep = 4;
+            showStep(4);
+            startTimer();
+            showQuestion();
+            
+            // Record quiz start time
+            localStorage.setItem('quizStartTime', new Date().toISOString());
+            showNotification('Quiz started', 'success');
+        });
+
+        function showQuestion() {
+            const question = selectedQuestions[currentQuestionIndex];
+            document.getElementById('questionText').textContent = question.question;
+            document.getElementById('questionProgress').textContent = `Question ${currentQuestionIndex + 1}/50`;
+            
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-3 skeu-button mb-2 rounded';
+                btn.textContent = option;
+                btn.onclick = () => selectAnswer(index);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(index) {
+            userAnswers[currentQuestionIndex] = index;
+            document.querySelectorAll('#options button').forEach((btn, i) => {
+                btn.classList.remove('selected-option');
+                if (i === index) {
+                    btn.classList.add('selected-option');
+                }
+            });
+        }
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            // Check if answer has been selected
+            if (userAnswers[currentQuestionIndex] === undefined) {
+                showNotification('Please select an answer', 'error');
+                return;
+            }
+            
+            if (currentQuestionIndex < selectedQuestions.length - 1) {
+                currentQuestionIndex++;
+                showQuestion();
+            } else {
+                submitQuiz();
+            }
+        });
+
+        function startTimer() {
+            let timeLeft = 30 * 60; // 30 minutes
+            const timerElement = document.getElementById('timer');
+            
+            timerInterval = setInterval(() => {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (timeLeft === 300) { // 5 minutes warning
+                    showNotification('5 minutes remaining!', 'error');
+                }
+                
+                if (timeLeft === 0) {
+                    clearInterval(timerInterval);
+                    submitQuiz();
+                }
+                timeLeft--;
+            }, 1000);
+        }
+
+        function submitQuiz() {
+            clearInterval(timerInterval);
+            
+            // Calculate score (for demo purposes)
+            let score = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === selectedQuestions[index].correct) {
+                    score++;
+                }
+            });
+            
+            // Store quiz results
+            const quizResults = {
+                userId: sessionId,
+                mobile: localStorage.getItem('userMobile'),
+                name: localStorage.getItem('userName'),
+                score: score,
+                totalQuestions: selectedQuestions.length,
+                answers: userAnswers,
+                completionTime: new Date().toISOString(),
+                ipAddress: "Captured on server",
+                deviceInfo: navigator.userAgent
+            };
+            
+            // Store quiz results (in production, send to server)
+            localStorage.setItem('quizResults', JSON.stringify(quizResults));
+            localStorage.setItem('quizCompleted', 'true');
+            
+            currentStep = 5;
+            showStep(5);
+            showNotification('Quiz submitted successfully', 'success');
+        }
+
+        // Browser/device fingerprinting for session control
+        function checkPreviousAttempt() {
+            if (localStorage.getItem('quizCompleted') === 'true') {
+                document.body.innerHTML = `
+                    <div class="flex items-center justify-center h-screen">
+                        <div class="max-w-md mx-auto skeu-container text-center">
+                            <h1 class="text-3xl mb-4 skeu-heading">Quiz Already Completed</h1>
+                            <p class="mb-6">You have already completed the quiz from this device.</p>
+                            <p class="text-sm mb-4">The quiz system allows only one attempt per user/device.</p>
+                            <a href="https://zerotize.in/pay/mKP0mr9h" class="skeu-button py-2 px-6 rounded inline-block">Proceed to Payment</a>
+                        </div>
+                    </div>
+                `;
+                return true;
+            }
+            return false;
+        }
+        
+        // Check for existing session on page load
+        if (checkPreviousAttempt()) {
+            console.log("Previous attempt detected");
+        }
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
